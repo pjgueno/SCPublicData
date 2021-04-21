@@ -1,0 +1,22 @@
+API Umweltbundesamt
+
+https://www.umweltbundesamt.de/api/air_data/v2/measures/json?component=1&scope=1&date_from=2021-02-21&time_from=12&date_to=2021-02-21&time_to=12
+
+component:
+
+0= PM2.5?
+1= PM10
+5= NO2
+
+scope:
+
+1 = Tagemittelwert
+
+Stations:
+
+https://www.umweltbundesamt.de/api/air_data/v2/stations/json
+
+
+Tagesmittelwert PM10 1 station für Grafik:
+
+https://www.umweltbundesamt.de/api/air_data/v2/measures/chart?date_from=2020-07-06&time_from=24&date_to=2021-02-20&time_to=24&data[0][co]=1&data[0][sc]=1&data[0][da]=2020-10-01&data[0][ti]=12&data[0][st]=436&data[0][va]=null&data[1][co]=1&data[1][sc]=1&data[1][da]=2020-10-01&data[1][ti]=12&data[1][st]=1890&data[1][va]=11&lang=de

@@ -1,0 +1,68 @@
+
+
+//translated = L.Projection.SphericalMercator.unproject(new L.Point(measures[i][lonField], measures[i][latField]));
+
+//translated = L.Projection.SphericalMercator.unproject(new L.Point(measures[i][lonField], measures[i][latField]));
+//                measures[i][lonField] = translated.lng;
+//                measures[i][latField] = translated.lat;
+
+
+//https://airindex.eea.europa.eu/Map/AQI/Viewer/
+//
+//https://www.eea.europa.eu/data-and-maps/explore-interactive-maps/up-to-date-air-quality-data
+
+//https://discomap.eea.europa.eu/Map/UTDViewer/UTDViewer/
+
+//https://discomap.eea.europa.eu/Map/UTDViewer/dataService/AllDaily?polu=PM10&dt=20210126100000
+
+//https://discomap.eea.europa.eu/Map/UTDViewer/dataService/AllDaily?polu=NO2&dt=20210126100000
+
+
+
+
+
+
+//https://discomap.eea.europa.eu/Map/UTDViewer/dataService/DailySamplingPoint?spo=SP_45168002_10_49
+
+//https://discomap.eea.europa.eu/Map/UTDViewer/UTDViewer/config.json
+
+
+//AJOUTER LES SATTIONS DANS LES CONVEX HULL
+
+//INFO:
+//
+//https://airindex.eea.europa.eu/Map/AQI/Viewer/current?dt=2020-08-26T08:00:00.000Z&polu=0&stclass=All
+//
+//stclass Non-traffic Traffic
+//
+//polu=0
+//
+//0	"StationCode"
+//1	"SamplingPoint"
+//2	"PollutantId"
+//3	"WorstPollutantId"
+//4	"BandId"
+//5	"WorstBandId"
+//6	"Value"
+//7	"CAMS"
+//8	"Worst"
+//9	"StationClassification"
+//10	"AreaClassification"
+//11	"NormalizedValue"
+//12	"Compliant"
+//13	"NODATA"
+//
+//https://airindex.eea.europa.eu/Map/AQI/Viewer/instant?dt=2020-08-26T05%3A00%3A00.000Z&st=FR33203
+//https://airindex.eea.europa.eu/Map/AQI/Viewer/pie?st=FR33203&polu=0
+//https://airindex.eea.europa.eu/Map/AQI/Viewer/pastDays?st=FR33203&dt=2020-08-26T05%3A00%3A00.000Z
+
+//https://airindex.eea.europa.eu/Map/AQI/Viewer/forecast?dt=2020-08-27T07%3A00%3A00.000Z&polu=0&stclass=All
+
+//https://airindex.eea.europa.eu/Map/AQI/Viewer/current?dt=2020-08-26T13%3A00%3A00.000Z&polu=0&stclass=All
+
+//A VOIR:
+//var pollutants = {"SO2":1,"PM10":192,"PM2.5":246,"O3":352,"NO2":423};
+
+//CALL POUR LES TYPE DE VALEURS
+
+//https://airindex.eea.europa.eu/Map/AQI/Viewer/instant?dt=2020-08-26T12%3A50%3A00.000Z&st=DEBY004
