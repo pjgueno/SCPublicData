@@ -9,7 +9,7 @@ import * as d3_Transition from "d3-transition";
 import {scaleTime, scaleLinear} from 'd3-scale';
 import {geoPath, geoTransform} from 'd3-geo';
 import {timeMinute} from 'd3-time';
-import {timeFormatLocale, timeParse} from 'd3-time-format';
+import {timeFormatLocale, timeParse, timeFormat} from 'd3-time-format';
 import {median} from 'd3-array';
 import {interpolateRgb} from 'd3-interpolate';
 import {csvParse} from 'd3-dsv';
@@ -27,8 +27,9 @@ import labs from './labs.js';
 import wind from './wind.js';
 import * as config from './config.js';
 import EUdata from './eudata.js';
-import UBAdata from './ubadata.js';
+//import UBAdata from './ubadata.js';
 import AURAdata from './auradata.js';
+import Luchtmeetnetdata from './Luchtmeetnetdata.js';
 
 import '../css/style.css';
 import * as places from './places.js';
@@ -39,7 +40,7 @@ import * as translate from './translate.js';
 import './static-files'
 
 
-
+//Atmo Sud et Atmo Occitanie
 
 //
 //https://api.luchtmeetnet.nl/open_api/stations/NL10301
@@ -51,7 +52,11 @@ import './static-files'
 
 //Liste de radios : current / 1h /24 h selon les sources
 
-// declare variables
+// declare data containers
+
+//https://www.umweltbundesamt.de/daten/luft/luftdaten/doc#tag/measurements
+
+//https://www.umweltbundesamt.de/api/air_data/v2/measures/json?date_from=2021-04-21&time_from=1&date_to=2021-04-21&time_to=15
 
 let SC_PM = {"type": "FeatureCollection","name": "SCSensors","crs": { "type": "name", "properties": {"name": "urn:ogc:def:crs:OGC:1.3:CRS84" }},"features": []};
 
@@ -214,8 +219,6 @@ var EUStationsMap = L.geoJSON(EUofficialData.PM25,{
                         var popupContent = "<h2>EU STATIONS MAP</h2><p><b>Name</b> : "+feature.properties.Name+"</p><p><b>Value</b> : "+feature.properties.Value+" µg\/m&sup3; ("+ feature.properties.AreaClassification +")</p><button type='button' id='button" + feature.properties.samplePointID + "' value='" + feature.properties.samplePointID + "'>Show graph!</button><div id='graph"+ feature.properties.samplePointID +"'></div>";
                         layer.bindPopup(popupContent,{closeOnClick: false,autoClose: false,closeButton:true});
                       }
-
-
                         }).addTo(map);
 
 
@@ -279,7 +282,6 @@ var SCSensorsMap = L.geoJSON(SC_PM,{
                       onEachFeature: function (feature, layer) {
                         var popupContent = "<h2>SENSORS MAP</h2><p><b>Sensor ID</b> : "+feature.properties.id+"</p><p><b>PM10</b> : "+feature.properties.data.PM10+" µg\/m&sup3;</p><p><b>PM25</b> : "+feature.properties.data.PM25+" µg\/m&sup3;</p><button type='button' id='button" + feature.properties.id + "' value='" + feature.properties.id + "'>Show graph!</button><div id='graph"+ feature.properties.id +"'></div>";
                         layer.bindPopup(popupContent,{closeOnClick: false,autoClose: false,closeButton:true});
-                          
                       }}).addTo(map);
 
 window.onload = function () {
@@ -312,26 +314,30 @@ The values are refreshed every 5 minutes in order to fit with the measurement fr
 	map.setView(coordsCenter, zoomLevel);
 	map.clicked = 0;
     
-    
-
 	//retrieve data from api
 	retrieveData();
-    retrieveDataEU();
-//    retrieveDataUBA();
-    retrieveDataAtmoAURA();
+    //retrieveDataEU();
+   // retrieveDataAtmoAURA();
+    retrieveDataLuchtmeetnet();
+    
+    
+    
+    //    retrieveDataUBA();
+
 
 	// refresh data
 	setInterval(function () {
         SCSensorsMap.clearLayers();
 		retrieveData();
         EUStationsMap.clearLayers();
-        retrieveDataEU();
+       // retrieveDataEU();
         AtmoAURAStationsMap.clearLayers();
-        retrieveDataAtmoAURA();
+       // retrieveDataAtmoAURA();
+        AtmoAURAStationsMap.clearLayers();
+        retrieveDataLuchtmeetnet();
 	}, 300000);
 
 	map.on('moveend', function () {
-//		hexagonheatmap._zoomChange();
 	});
 
 	map.on('click', function (e) {
@@ -346,12 +352,12 @@ The values are refreshed every 5 minutes in order to fit with the measurement fr
 		}
 		clicked = null;
 	});
+    
 	map.on('dblclick', function () {
 		map.zoomIn();
 		clicked += 1;
 	});
     
-
 	// Load lab and windlayer, init checkboxes
 	if (config.layer_labs) {
 		d3.select("#cb_labs").property("checked", true);
@@ -376,11 +382,7 @@ The values are refreshed every 5 minutes in order to fit with the measurement fr
 	d3.select("#cb_labs").on("change", switchLabLayer);
 	d3.select("#cb_wind").on("change", switchWindLayer);
 
-    
-    
     map.on('popupopen', function(e){
-        
-        
         console.log("open popup");
         //console.log(e.popup.getElement());
         
@@ -395,7 +397,6 @@ The values are refreshed every 5 minutes in order to fit with the measurement fr
         console.log(d3.select('#button'+ sensorid ));
         
         var graph = false;
-            
             
         d3.select('#button'+ sensorid ).on('click', function(){  
         var panel_str = "<iframe src='https://maps.sensor.community/grafana/d-solo/000000004/single-sensor-view?orgId=1&panelId=2&var-node=" + sensorid + "' width='280' height='200' frameborder='0'></iframe>";
@@ -906,8 +907,6 @@ function retrieveDataAtmoAURA() {
 var URLPM10 = "http://api.atmo-aura.fr/api/v1/valeurs/horaire?api_token=1251e9082cde33bf43df042595c0583c&date_debut=-24hours&label_court_polluant=PM10&valeur_brute=true"
 var URLPM25 = "http://api.atmo-aura.fr/api/v1/valeurs/horaire?api_token=1251e9082cde33bf43df042595c0583c&date_debut=-24hours&label_court_polluant=PM2.5&valeur_brute=true"
 
-
-
 //    "http://api.atmo-aura.fr/api/v1/valeurs/horaire?api_token={api_token}&date_debut=-1hours&label_court_polluant={polluant}&valeur_brute=true"
 
 console.log(URLPM10);
@@ -955,6 +954,87 @@ AURAdata.getData(URLPM25).then(function (result) {
 }); 
 }
 
+
+function retrieveDataLuchtmeetnet() {
+    
+    
+var dateStrings = LuchtmeetnetdateFormater(new Date());
+
+
+var URLPM10 = "https://api.luchtmeetnet.nl/open_api/measurements?start="+ dateStrings[1] +"&end="+ dateStrings[0] + "&station_number=&formula=PM10"
+
+
+
+
+var URLPM25 = "https://api.luchtmeetnet.nl/open_api/measurements?start="+ dateStrings[1] +"&end="+ dateStrings[0] + "&station_number=&formula=PM25"
+
+
+
+console.log(URLPM10);
+console.log(URLPM25);
+
+Luchtmeetnetdata.getData(URLPM10)
+    .then(function (result) {
+
+//        console.log(result);        
+    LuchtmeetnetData.PM10.features = result;
+    console.log(LuchtmeetnetData.PM10);
+    return getCurrent(LuchtmeetnetData.PM10.features);
+    })
+    .then(function (result){ 
+
+    AtmoAURADataCurrent.PM10.features = result;
+
+
+if(user_selected_value == "PM10"){
+    AtmoAURAStationsMap.clearLayers();
+    AtmoAURAStationsMap.addData(AtmoAURADataCurrent.PM10).bringToFront();
+    }
+});
+
+Luchtmeetnetdata.getData(URLPM25).then(function (result) {
+
+//       console.log(result);
+
+    LuchtmeetnetData.PM25.features = result;  
+    console.log(LuchtmeetnetData.PM25);
+
+    return getCurrent(LuchtmeetnetData.PM25.features);
+
+    })
+    .then(function(result){
+
+
+    AtmoAURADataCurrent.PM25.features = result;
+
+     if(user_selected_value == "PM25"){
+    AtmoAURAStationsMap.clearLayers();
+    AtmoAURAStationsMap.addData(AtmoAURADataCurrent.PM25).bringToFront();
+    }
+
+}); 
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function retrieveDataEU() {
 
 var dateString = EUdateFormater(new Date());
@@ -997,6 +1077,28 @@ console.log(user_selected_value);
 
 }    
     
+
+function LuchtmeetnetdateFormater(date) {
+    
+const dateFormater = timeFormat("%Y-%m-%dT%H:%M:%SZ");
+
+    var result =[];
+    result.push(dateFormater(date));
+    
+    result.push(dateFormater(date.setHours(date.getHours()-12)));
+
+    console.log(date.getDate()-12);
+    console.log(result);
+
+return result;
+}
+
+
+
+
+
+
+
 function EUdateFormater(date) {
 
     date.setDate(date.getDate()); // can adjust the day by substracting
@@ -1105,26 +1207,18 @@ function reloadMap(val) {
     SCSensorsMap.clearLayers();
     SCSensorsMap.addData(SC_PM).bringToBack();
     
-     if(user_selected_value == "PM10"){
+     if(val == "PM10"){
         EUStationsMap.clearLayers();
         EUStationsMap.addData(EUofficialData.PM10).bringToFront();
-        };
-    
-    
-     if(user_selected_value == "PM25"){
-        EUStationsMap.clearLayers();
-        EUStationsMap.addData(EUofficialData.PM25).bringToFront();
-        }; 
-    
-     if(user_selected_value == "PM10"){
         AtmoAURAStationsMap.clearLayers();
         AtmoAURAStationsMap.addData(AtmoAURAData.PM10).bringToFront();
         };
     
-    
-     if(user_selected_value == "PM25"){
+     if(val == "PM25"){
+        EUStationsMap.clearLayers();
+        EUStationsMap.addData(EUofficialData.PM25).bringToFront();
         AtmoAURAStationsMap.clearLayers();
-        AtmoAURAStationsMap.addData(AtmoAURAData.PM25).bringToFront();
+        AtmoAURAStationsMap.addData(AtmoAURAData.PM25).bringToFront();   
         }; 
 }
 
@@ -1229,10 +1323,8 @@ function switchTo(element) {
 }
 
 function getCurrent(data){
-    
     var current = [];
     var parseDate = timeParse("%Y-%m-%dT%H:%M:%SZ");
-
     var listeSites = [];
     data.forEach(function(e){
         if(!listeSites.includes(e.properties.site_id)){        

@@ -2,6 +2,7 @@ import {csvParse} from 'd3-dsv';
 import 'whatwg-fetch'
 import * as netherlands from './netherlands_stations.js';
 
+//https://api.luchtmeetnet.nl/open_api/measurements?start=2021-04-21T00:00:00Z&end=2021-04-21T19:00:00Z&station_number=&formula=PM10&page=&order_by=timestamp_measured&order_direction=desc
 
 let Luchtmeetnetdata = {
     

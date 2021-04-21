@@ -1,8 +1,11 @@
 # Sensor.Community public data aggregator
 Visualize recent sensor data on a world map for [Sensor.Community](https://sensor.community) and for differents official measurements:
 * EEA
-* RIVM
-* Atmo
+* Luchtmeetnet
+* Atmo AURA
+* Atmo Sud
+* Atmo Occitanie
+* UmweltBundesamt
  
 # Map application
 The implementation makes use of various frameworks and is on [ECMA 6](https://developer.mozilla.org/de/docs/Web/JavaScript) language level. 
