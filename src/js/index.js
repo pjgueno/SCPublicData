@@ -187,7 +187,7 @@ if (query.noeustations === "false") { config.layer_eustations = 1 } else {config
 
 // show betterplace overlay
 if (query.nooverlay === "false") d3.select("#betterplace").style("display", "inline-block");
-d3.select("#loading").html(translate.tr(lang,d3.select("#loading").html()));
+//d3.select("#loading").html(translate.tr(lang,d3.select("#loading").html()));
 config.selection = (query.sensor !== undefined) ? query.sensor : config.selection;
 d3.select("#custom-select").select("select").property("value", config.selection);
 
@@ -302,7 +302,7 @@ var AtmoOccitanieStationsMap = L.geoJSON(AtmoOccitanieDataCurrent.PM25,{
                         stroke:true,
                         weight:2,
                         stroke:true,
-                        color :'black',
+                        color :'violet',
                         fillOpacity: 1})
                       },
                       onEachFeature: function (feature, layer) {
@@ -410,27 +410,27 @@ window.onload = function () {
 	map.clicked = 0;
     
 	//retrieve data from api
-retrieveData();
+//retrieveData();
 //    retrieveDataEU();
-//    retrieveDataAtmoAURA();
 //    retrieveDataLuchtmeetnet();
 //    retrieveDataUBA();
-    //retrieveDataAtmoPACA();
+    retrieveDataAtmoAURA();
+    retrieveDataAtmoPACA();
     retrieveDataAtmoOccitanie();
 
 
 	// refresh data
 	setInterval(function () {
-      SCSensorsMap.clearLayers();
-	retrieveData();
+     // SCSensorsMap.clearLayers();
+	//retrieveData();
 //        EUStationsMap.clearLayers();
 //       retrieveDataEU();
-//        AtmoAURAStationsMap.clearLayers();
-//       retrieveDataAtmoAURA();
-//        AtmoAURAStationsMap.clearLayers();
+//        LuchtmeetnetStationsMap.clearLayers();
 //        retrieveDataLuchtmeetnet();
-        //AtmoPACAStationsMap.clearLayers();
-        //retrieveDataAtmoPACA()
+        AtmoAURAStationsMap.clearLayers();
+        retrieveDataAtmoAURA();
+        AtmoPACAStationsMap.clearLayers();
+        retrieveDataAtmoPACA()
         AtmoOccitanieStationsMap.clearLayers();
         retrieveDataAtmoOccitanie();
 	}, 900000);
@@ -484,8 +484,9 @@ retrieveData();
         console.log("open popup");
         //console.log(e.popup.getElement());
         
-        var popuptype = d3.select(e.popup.getElement())._groups[0][0].children[0].children[0].children[0].outerText;
+        var popuptype = d3.select(e.popup.getElement())._groups[0][0].children[0].children[0].children[0].innerText;
         
+        console.log(d3.select(e.popup.getElement()));
         console.log(popuptype);
         
         if (popuptype == "SENSORS MAP"){        
@@ -816,7 +817,7 @@ SC_PM.features = mapper;
 SCSensorsMap.clearLayers();
 SCSensorsMap.addData(SC_PM).bringToBack();
 
-d3.select("#loading_layer").style("display", "none");   
+//d3.select("#loading_layer").style("display", "none");   
     });
 }
 
@@ -882,7 +883,7 @@ if(user_selected_value == "PM10"){
 AURAdata.getData(URLPM25).then(function (result) {
 
     AtmoAURAData.PM25.features = result;  
-    return getCurrentAURAAURA(AtmoAURAData.PM25.features);
+    return getCurrentAURA(AtmoAURAData.PM25.features);
 
     })
     .then(function(result){
@@ -1150,16 +1151,27 @@ function reloadMap(val) {
     
      if(val == "PM10"){
         EUStationsMap.clearLayers();
-        EUStationsMap.addData(EUofficialData.PM10).bringToFront();
+        EUStationsMap.addData(EUofficialData.PM10).bringToFront(); 
+        LuchtmeetnetStationsMap.clearLayers();
+        LuchtmeetnetStationsMap.addData(EUofficialData.PM10).bringToFront();
         AtmoAURAStationsMap.clearLayers();
-        AtmoAURAStationsMap.addData(AtmoAURAData.PM10).bringToFront();
+        AtmoAURAStationsMap.addData(AtmoAURADataCurrent.PM10).bringToFront();
+        AtmoPACAStationsMap.clearLayers();
+        AtmoPACAStationsMap.addData(AtmoPACADataCurrent.PM10).bringToFront();
+        AtmoOccitanieStationsMap.clearLayers();
+        AtmoOccitanieStationsMap.addData(AtmoOccitanieDataCurrent.PM10).bringToFront();
         };
     
      if(val == "PM25"){
         EUStationsMap.clearLayers();
         EUStationsMap.addData(EUofficialData.PM25).bringToFront();
-        AtmoAURAStationsMap.clearLayers();
-        AtmoAURAStationsMap.addData(AtmoAURAData.PM25).bringToFront();   
+        LuchtmeetnetStationsMap.clearLayers();
+        LuchtmeetnetStationsMap.addData(EUofficialData.PM25).bringToFront();
+        AtmoAURAStationsMap.addData(AtmoAURADataCurrent.PM25).bringToFront();
+        AtmoPACAStationsMap.clearLayers();
+        AtmoPACAStationsMap.addData(AtmoPACADataCurrent.PM25).bringToFront();
+        AtmoOccitanieStationsMap.clearLayers();
+        AtmoOccitanieStationsMap.addData(AtmoOccitanieDataCurrent.PM25).bringToFront();  
         }; 
 }
 
