@@ -316,13 +316,6 @@ var AtmoOccitanieStationsMap = L.geoJSON(AtmoOccitanieDataCurrent.PM25,{
 
                         }).addTo(map);
 
-
-
-
-
-
-
-
 var AtmoAURAStationsMap = L.geoJSON(AtmoAURADataCurrent.PM25,{
                       pointToLayer: function (feature, latlng) {
                        return L.circleMarker(latlng, {
@@ -677,11 +670,6 @@ retrieveData();
             });
         };
         
-        
-        
-        
-        
-        
         if(popuptype == "Atmo PACA MAP") {
            
             var stationid = d3.select(e.popup.getElement())._groups[0][0].children[0].children[0].children[3].value;
@@ -728,8 +716,7 @@ retrieveData();
             });
         };
         
-        
-             if(popuptype == "Atmo Occitanie MAP") {
+        if(popuptype == "Atmo Occitanie MAP") {
            
             var stationid = d3.select(e.popup.getElement())._groups[0][0].children[0].children[0].children[3].value;
 
@@ -774,7 +761,6 @@ retrieveData();
             };
             });
         };
-        
         
     })
 };
@@ -833,11 +819,6 @@ SCSensorsMap.addData(SC_PM).bringToBack();
 d3.select("#loading_layer").style("display", "none");   
     });
 }
-
-
-
-
-
 
 function retrieveDataUBA() {
 
@@ -916,8 +897,6 @@ AURAdata.getData(URLPM25).then(function (result) {
 }); 
 }
 
-
-
 function retrieveDataAtmoPACA() {
 
 var URL = "https://geoservices.atmosud.org/geoserver/mes_sudpaca_horaire_poll_princ/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=mes_sudpaca_horaire_poll_princ:mes_sudpaca_horaire_3j&outputFormat=application/json&srsName=EPSG:4326"
@@ -951,8 +930,6 @@ if(user_selected_value == "PM10"){
 }); 
 }
 
-
-
 function retrieveDataAtmoOccitanie() {
 
 var URL = "https://opendata.arcgis.com/datasets/4a648b54876f485e92f22e2ad5a5da32_0.geojson"
@@ -964,7 +941,7 @@ Occitaniedata.getData(URL)
     
     AtmoOccitanieData.PM10.features = result.PM10;
     AtmoOccitanieData.PM25.features = result.PM25;
-    return getCurrentPACA(AtmoOccitanieData);
+    return getCurrentOccitanie(AtmoOccitanieData);
     })
     .then(function (result){
     
@@ -985,10 +962,6 @@ if(user_selected_value == "PM10"){
 
 }); 
 }
-
-
-
-
 
 function retrieveDataLuchtmeetnet() {
     
@@ -1018,25 +991,6 @@ Luchtmeetnetdata.getData(URLPM25).then(function (result) {
 
 }); 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 function retrieveDataEU() {
 
@@ -1100,10 +1054,6 @@ function EUdateFormater(date) {
 return result;
 }
 
-
-
-
-
 function UBAdateFormater(date) {
 
     date.setDate(date.getDate()-1); // can adjust the day by substracting
@@ -1113,12 +1063,6 @@ function UBAdateFormater(date) {
 
 return result;
 }
-
-
-
-
-
-
 
 function pad(num,size,month) {
 
@@ -1339,7 +1283,6 @@ function getCurrentAURA(data){
  return current   
 }
 
-
 function getCurrentPACA(data){
     
     var dataOut = {"PM10":[],"PM25":[]};
@@ -1386,9 +1329,51 @@ function getCurrentPACA(data){
  return dataOut   
 }
 
+function getCurrentOccitanie(data){
+    
+    var dataOut = {"PM10":[],"PM25":[]};
+    
+//    "2021/04/21 00:59"
+    
+    var parseDate = timeParse("%Y-%m-%dT%H:%M:%SZ");
+    var listeSitesPM10 = [];
+    var listeSitesPM25 = [];
+    
+    
+    data.PM10.features.forEach(function(e){
+        if(!listeSitesPM10.includes(e.properties.code_station)){        
+                listeSitesPM10.push(e.properties.code_station)}     
+        });
+    
+    listeSitesPM10.forEach(function(e){
+        var filter = data.PM10.features.filter(o => o.properties.code_station == e)
+        
+        filter.sort(function(a,b){
+          return new Date(parseDate(a.properties.date_fin)) - new Date(parseDate(b.properties.date_fin));
+        });
+//      current.push(filter[filter.length-1])
+        dataOut.PM10.push(filter[0])        
+    });
+    
 
-
-
+        data.PM25.features.forEach(function(e){
+        if(!listeSitesPM25.includes(e.properties.code_station)){        
+                listeSitesPM25.push(e.properties.code_station)}     
+        });
+    
+    listeSitesPM25.forEach(function(e){
+        var filter = data.PM25.features.filter(o => o.properties.code_station == e)
+        
+        filter.sort(function(a,b){
+          return new Date(parseDate(a.properties.date_fin)) - new Date(parseDate(b.properties.date_fin));
+        });
+//      current.push(filter[filter.length-1])
+        dataOut.PM25.push(filter[0])        
+    });
+     
+    
+ return dataOut   
+}
 
 function graphicBuilder(data,selector){
     
