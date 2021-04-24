@@ -486,7 +486,6 @@ window.onload = function () {
         
         var popuptype = d3.select(e.popup.getElement())._groups[0][0].children[0].children[0].children[0].innerText;
         
-        console.log(d3.select(e.popup.getElement()));
         console.log(popuptype);
         
         if (popuptype == "SENSORS MAP"){        
@@ -629,6 +628,8 @@ window.onload = function () {
            
             var stationid = d3.select(e.popup.getElement())._groups[0][0].children[0].children[0].children[3].value;
 
+            console.log(stationid);
+            
             var graph = false;
         
             if (user_selected_value == "PM10"){    
@@ -1167,6 +1168,7 @@ function reloadMap(val) {
         EUStationsMap.addData(EUofficialData.PM25).bringToFront();
         LuchtmeetnetStationsMap.clearLayers();
         LuchtmeetnetStationsMap.addData(EUofficialData.PM25).bringToFront();
+        AtmoAURAStationsMap.clearLayers();
         AtmoAURAStationsMap.addData(AtmoAURADataCurrent.PM25).bringToFront();
         AtmoPACAStationsMap.clearLayers();
         AtmoPACAStationsMap.addData(AtmoPACADataCurrent.PM25).bringToFront();
