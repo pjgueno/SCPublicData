@@ -11,14 +11,18 @@ let UBAdata = {
         .then((json) => {
         UBAStations = json.data; 
     });
+
         
+        
+        
+     
            
     return fetch(URL)
 			.then((resp) => resp.json())
 			.then((json) => {
             
 				console.log('successful retrieved data');
-        
+                console.log(json);
         
         
         var mapper = [];

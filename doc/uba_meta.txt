@@ -1,0 +1,7 @@
+https://www.umweltbundesamt.de/api/air_data/v2/components/json
+
+https://www.umweltbundesamt.de/api/air_data/v2/scopes/json
+
+https://www.umweltbundesamt.de/api/air_data/v2/stationsettings/json
+
+https://www.umweltbundesamt.de/api/air_data/v2/stationtypes/json

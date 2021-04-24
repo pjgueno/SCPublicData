@@ -25,7 +25,7 @@ let EUdata = {
         dataEUfeature.properties.Code = obj.STATIONCODE;
         dataEUfeature.properties.Name = obj.STATIONNAME;
         dataEUfeature.properties.Location = obj.MUNICIPALITY;
-        dataEUfeature.properties.samplePointID = obj.SAMPLINGPOINT_LOCALID.replaceAll(".", "xxx");
+        dataEUfeature.properties.samplePointID = obj.SAMPLINGPOINT_LOCALID.replaceAll(".", "xxx").replaceAll(":","yyy");
         dataEUfeature.properties.Value = parseFloat(obj.VALUE_NUMERIC);
         dataEUfeature.properties.dateBegin = obj.DATETIME_BEGIN;
         dataEUfeature.properties.dateEnd = obj.DATETIME_END;
@@ -33,12 +33,6 @@ let EUdata = {
         
         return dataEUfeature;
         })
-        console.log(mapper);
-        
-        //filter -1 values
-        
-//        var filter = mapper.filter(d => d.properties.Value != -1);
-//        return filter;
         
         return mapper;
         
