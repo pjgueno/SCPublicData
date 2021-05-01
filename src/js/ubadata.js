@@ -1,28 +1,36 @@
 import 'whatwg-fetch'
+import {timeParse,timeFormat} from 'd3-time-format';
+
 
 let UBAdata = {
     
     getData: async function (URL) {
     
     var UBAStations = {};
-    
-    fetch("https://www.umweltbundesamt.de/api/air_data/v2/stations/json")
+        
+//        fetch("https://www.umweltbundesamt.de/api/air_data/v2/stations/json")
+
+    var parseDate = timeParse("%Y-%m-%d %H:%M:%S");
+    var dateFormater = timeFormat("%Y-%m-%d %H:%M:%S");
+
+
+        
+    fetch("https://maps.sensor.community/uba-api/air_data/v2/stations/json")
         .then((resp) => resp.json())
         .then((json) => {
+//        console.log(json);
+//        console.log(json);
         UBAStations = json.data; 
     });
 
-        
-        
-        
-     
-           
+    console.log(URL); 
+       
     return fetch(URL)
 			.then((resp) => resp.json())
 			.then((json) => {
             
 				console.log('successful retrieved data');
-                console.log(json);
+              console.log(json);
         
         
         var mapper = [];
@@ -30,23 +38,44 @@ let UBAdata = {
         
         for (var key in json.data) {
         
-          if (json.data.hasOwnProperty(key)) {
+          if (UBAStations.hasOwnProperty(key)) {
               
-            var dataUBAfeature = { "type": "Feature", "properties": { "id": "", "code": "", "name": "", "value": ""}, "geometry": { "type": "Point", "coordinates": []}};
+            var dataUBAfeature = { "type": "Feature", "properties": { "id":"", "code": "", "name": "", "value": "", "type1":"", "type2":"", "type3":"", "date":""}, "geometry": { "type": "Point", "coordinates": []}};
               
               
-            dataEUfeature.geometry.coordinates[0] = parseFloat(UBAStations[key][7]);
-            dataEUfeature.geometry.coordinates[1] = parseFloat(UBAStations[key][8]); 
-            dataUBAfeature.properties.value = json.data[key][json.request.datetime_to].value;
+            dataUBAfeature.geometry.coordinates[0] = parseFloat(UBAStations[key][7]);
+            dataUBAfeature.geometry.coordinates[1] = parseFloat(UBAStations[key][8]); 
+              
+              
+//            console.log(Object.keys(json.data[key]));
+
+         //  console.log(json.data);
+              
+              
+              
+           var tabDate = Object.keys(json.data[key]).sort(function(a,b){
+          return new Date(parseDate(a)) - new Date(parseDate(b));
+        });
+              
+//            console.log(tabDate[tabDate.length -1]);
+              
+
+            dataUBAfeature.properties.value = json.data[key][tabDate[tabDate.length -1]][2];
+            dataUBAfeature.properties.date = json.data[key][tabDate[tabDate.length -1]][3];              
             dataUBAfeature.properties.id = UBAStations[key][0];
             dataUBAfeature.properties.code = UBAStations[key][1];
             dataUBAfeature.properties.name = UBAStations[key][2];
+            dataUBAfeature.properties.type1 = UBAStations[key][14];
+            dataUBAfeature.properties.type2 = UBAStations[key][15];
+            dataUBAfeature.properties.type3 = UBAStations[key][16];
+              
+//            console.log(dataUBAfeature)
               
             mapper.push(dataUBAfeature);
           }
         };
         
-        console.log(mapper);
+//        console.log(mapper);
         
         return mapper;
         

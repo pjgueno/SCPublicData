@@ -245,29 +245,30 @@ var EUStationsMap = L.geoJSON(EUofficialData.PM25,{
                         }).addTo(map);
 
 
-//
-//var UBAStationsMap = L.geoJSON(EUofficialData.PM25,{
-//                      pointToLayer: function (feature, latlng) {
-//                       return L.circleMarker(latlng, {
-//                        radius:5,
-//                        fillColor: colorScaler(user_selected_value,feature.properties.Value),
-//                        stroke:true,
-//                        weight:2,
-//                        stroke:true,
-//                        color :'black',
-//                        fillOpacity: 1})
-//                      },
-//                      onEachFeature: function (feature, layer) {
-//                          
-//                          if (feature.properties.Value == -1){feature.properties.Value = "N/A"};
-//                          
-//                        var popupContent = "<h2>UBA STATIONS MAP</h2><p><b>Name</b> : "+feature.properties.Name+"</p><p><b>Value</b> : "+feature.properties.Value+" µg\/m&sup3; ("+ feature.properties.type +")</p><button type='button' id='button" + feature.properties.samplePointID + "' value='" + feature.properties.samplePointID + "'>Show graph!</button><div id='graph"+ feature.properties.samplePointID +"'></div>";
-//                        layer.bindPopup(popupContent,{closeOnClick: false,autoClose: false,closeButton:true});
-//                      }
-//
-//
-//                        }).addTo(map);
-//
+
+var UBAStationsMap = L.geoJSON(UBAofficialData.PM25,{
+    
+                      pointToLayer: function (feature, latlng) {
+                       return L.circleMarker(latlng, {
+                        radius:5,
+                        fillColor: colorScaler(user_selected_value,feature.properties.value),
+                        stroke:true,
+                        weight:2,
+                        stroke:true,
+                        color :'black',
+                        fillOpacity: 1})
+                      },
+                      onEachFeature: function (feature, layer) {
+                                                    
+                          if (feature.properties.Value == -1){feature.properties.Value = "N/A"};
+                          
+                        var popupContent = "<h2>UBA STATIONS MAP</h2><p><b>Name</b> : "+feature.properties.name+"</p><p><b>Value</b> : "+feature.properties.value+" µg\/m&sup3; ("+ feature.properties.type1 +")</p><button type='button' id='button" + feature.properties.code + "' value='" + feature.properties.code + "'>Show graph!</button><div id='graph"+ feature.properties.code +"'></div>";
+                        layer.bindPopup(popupContent,{closeOnClick: false,autoClose: false,closeButton:true});
+                      }
+
+
+                        }).addTo(map);
+
 
 
 
@@ -410,13 +411,13 @@ window.onload = function () {
 	map.clicked = 0;
     
 	//retrieve data from api
-//retrieveData();
+retrieveData();
 //    retrieveDataEU();
 //    retrieveDataLuchtmeetnet();
-//    retrieveDataUBA();
-    retrieveDataAtmoAURA();
-    retrieveDataAtmoPACA();
-    retrieveDataAtmoOccitanie();
+    retrieveDataUBA();
+    //retrieveDataAtmoAURA();
+    //retrieveDataAtmoPACA();
+    //retrieveDataAtmoOccitanie();
 
 
 	// refresh data
@@ -427,12 +428,12 @@ window.onload = function () {
 //       retrieveDataEU();
 //        LuchtmeetnetStationsMap.clearLayers();
 //        retrieveDataLuchtmeetnet();
-        AtmoAURAStationsMap.clearLayers();
-        retrieveDataAtmoAURA();
-        AtmoPACAStationsMap.clearLayers();
-        retrieveDataAtmoPACA()
-        AtmoOccitanieStationsMap.clearLayers();
-        retrieveDataAtmoOccitanie();
+//        AtmoAURAStationsMap.clearLayers();
+//        retrieveDataAtmoAURA();
+//        AtmoPACAStationsMap.clearLayers();
+//        retrieveDataAtmoPACA()
+//        AtmoOccitanieStationsMap.clearLayers();
+//        retrieveDataAtmoOccitanie();
 	}, 900000);
 
 	map.on('moveend', function () {
@@ -768,10 +769,18 @@ window.onload = function () {
 };
 
 function colorScaler(option,value){
+    
+    
 
     if (typeof value == 'object'){
+        
+        if (value != null){
         if(option == "PM10"){return colorScalePM10(value.PM10);};  
-        if(option == "PM25"){return colorScalePM10(value.PM25);};   
+        if(option == "PM25"){return colorScalePM10(value.PM25);};     
+        }else{
+            return 'grey';
+        }
+        
      }else if (typeof value == 'number'){ 
         if(option == "PM10"){ return colorScalePM10(value);};
         if(option == "PM25"){return colorScalePM25(value);};     
@@ -779,7 +788,7 @@ function colorScaler(option,value){
 };
 
 function retrieveData() {
-    api.getData("https://data.sensor.community/static/v2/data.1h.json", 1).then(function (result) {
+    api.getData("https://data.sensor.community/static/v2/data.dust.min.json", 1).then(function (result) {
         if (result.timestamp > timestamp_data) {
             timestamp_data = result.timestamp;
             timestamp_from = result.timestamp_from;
@@ -826,24 +835,36 @@ function retrieveDataUBA() {
 
 var dateString = UBAdateFormater(new Date());
 
-var URLPM10 = "https://www.umweltbundesamt.de/api/air_data/v2/measures/json?date_from=2021-04-21&time_from=1&date_to=2021-04-21&time_to=15&component=1";
-var URLPM25 = "https://www.umweltbundesamt.de/api/air_data/v2/measures/json?date_from=2021-04-21&time_from=1&date_to=2021-04-21&time_to=15&component=9";
+//var URLPM10 = "https://www.umweltbundesamt.de/api/air_data/v2/measures/json?date_from=2021-04-21&time_from=1&date_to=2021-04-21&time_to=15&component=1";
+//var URLPM25 = "https://www.umweltbundesamt.de/api/air_data/v2/measures/json?date_from=2021-04-21&time_from=1&date_to=2021-04-21&time_to=15&component=9";
+    
+//    https://www.umweltbundesamt.de/api/air_data/v2/components/json
+    
+var URLPM10 = "https://maps.sensor.community/uba-api/air_data/v2/measures/json?date_from=2021-04-21&time_from=1&date_to=2021-04-21&time_to=15&component=1";
+var URLPM25 = "https://maps.sensor.community/uba-api/air_data/v2/measures/json?date_from=2021-04-21&time_from=1&date_to=2021-04-21&time_to=15&component=9";
 
 console.log(URLPM10);
 console.log(URLPM25);
 
 UBAdata.getData(URLPM10).then(function (result) {
+    
+    
 
     UBAofficialData.PM10.features = result;
+    
+    console.log(UBAofficialData.PM10.features);
 
-//    if(user_selected_value == "PM10"){
-//    UBAStationsMap.clearLayers();
-//    UBAStationsMap.addData(UBAofficialData.PM10).bringToFront();
-//    }
+    if(user_selected_value == "PM10"){
+    UBAStationsMap.clearLayers();
+    UBAStationsMap.addData(UBAofficialData.PM10).bringToFront();
+    }
 
         });
 
 UBAdata.getData(URLPM25).then(function (result) {
+    
+    console.log(result);
+    
     UBAofficialData.PM25.features = result;  
 
 //    if(user_selected_value == "PM25"){
@@ -1153,6 +1174,8 @@ function reloadMap(val) {
      if(val == "PM10"){
         EUStationsMap.clearLayers();
         EUStationsMap.addData(EUofficialData.PM10).bringToFront(); 
+        UBAStationsMap.clearLayers();
+        UBAStationsMap.addData(UBAofficialData.PM10).bringToFront(); 
         LuchtmeetnetStationsMap.clearLayers();
         LuchtmeetnetStationsMap.addData(EUofficialData.PM10).bringToFront();
         AtmoAURAStationsMap.clearLayers();
@@ -1289,8 +1312,8 @@ function getCurrentAURA(data){
         });
 //        console.log(filter);
         
-//        current.push(filter[filter.length-1])
-        current.push(filter[0])
+    current.push(filter[filter.length-1])
+//        current.push(filter[0])
         
     });
     
@@ -1320,7 +1343,7 @@ function getCurrentPACA(data){
           return new Date(parseDate(a.properties.date_fin)) - new Date(parseDate(b.properties.date_fin));
         });
 //      current.push(filter[filter.length-1])
-        dataOut.PM10.push(filter[0])        
+        dataOut.PM10.push(filter[filter.length-1])        
     });
     
 
@@ -1336,7 +1359,7 @@ function getCurrentPACA(data){
           return new Date(parseDate(a.properties.date_fin)) - new Date(parseDate(b.properties.date_fin));
         });
 //      current.push(filter[filter.length-1])
-        dataOut.PM25.push(filter[0])        
+        dataOut.PM25.push(filter[filter.length-1])        
     });
      
     
@@ -1366,7 +1389,14 @@ function getCurrentOccitanie(data){
           return new Date(parseDate(a.properties.date_fin)) - new Date(parseDate(b.properties.date_fin));
         });
 //      current.push(filter[filter.length-1])
-        dataOut.PM10.push(filter[0])        
+      //  dataOut.PM10.push(filter[0])     
+        dataOut.PM10.push(filter[filter.length-1]);
+        
+//        console.log(filter[filter.length-1]);
+//        console.log(filter[0]);
+        
+//        REVOIR PREMIER OU DERNIER
+        
     });
     
 
@@ -1382,7 +1412,7 @@ function getCurrentOccitanie(data){
           return new Date(parseDate(a.properties.date_fin)) - new Date(parseDate(b.properties.date_fin));
         });
 //      current.push(filter[filter.length-1])
-        dataOut.PM25.push(filter[0])        
+        dataOut.PM25.push(filter[filter.length-1]);      
     });
      
     
@@ -1454,8 +1484,152 @@ function graphicBuilder(data,selector){
                
          
      };                   
+    
+    //FORCE UPDATE THE GRADIENT
+
+    d3.selectAll("#line-gradient").remove();
+
+           
+    svg.append("linearGradient")
+      .attr("id", "line-gradient")
+      .attr("gradientUnits", "userSpaceOnUse")
+      .attr("x1", 0)
+      .attr("y1", y(0))
+      .attr("x2", 0)
+      .attr("y2", function (){
+         if(user_selected_value == "PM10"){return y(500)};
+   
+         if(user_selected_value == "PM25"){return y(100)};      
+     }) 
+      .selectAll("stop")
+        .data(
+         function (){
+         if(user_selected_value == "PM10"){return [{offset: "0%", color: "#00796b"},{offset: "4%", color: "#00796b"},{offset: "8%", color: "#f9a825"},{offset: "12%", color: "#e65100"},{offset: "20%", color: "#dd2c00"},{offset: "100%", color: "#8c0084"}]};
+   
+         if(user_selected_value == "PM25"){return [{offset: "0%", color: "#00796b"},{offset: "10%", color: "#00796b"},{offset: "20%", color: "#f9a825"},{offset: "40%", color: "#e65100"},{offset: "60%", color: "#dd2c00"},{offset: "100%", color: "#8c0084"}]};
+             
+     })
+      .enter().append("stop")
+        .attr("offset", function(d) { return d.offset; })
+        .attr("stop-color", function(d) { return d.color; });           
+               
+    //               
+//      const scale_options = {
+//	"PM10": {
+//		valueDomain: [0, 20, 40, 60, 100, 500],
+//		colorRange: ['#00796B','#00796B', '#F9A825', '#E65100', '#DD2C00', '#960084']
+//	},
+//	"PM25": {
+//		valueDomain: [0, 10, 20, 40, 60, 100],
+//		colorRange: [,'#00796B','#00796B', '#F9A825', '#E65100', '#DD2C00', '#960084']
+//	}
+//};         
+//               
+                    
+               
+      svg.append("path")
+     .data([data])
+      .attr("class", "line")  
+    .attr("fill", "none")
+    .attr("stroke", "url(#line-gradient)" )
+//    .style("stroke", "black")
+      .attr("d", valueline);
+  
+    svg.append("g")  
+   .attr("transform", "translate(" + 0 + "," + height  + ")")
+    .attr("class", "axis axis--x")
+    .call(axisBottom(x).ticks(3));           
+                           
+               
+      svg.append("g")
+  .attr("class", "axis axis--y")
+   .attr("transform", "translate(" + 0 + "," + 0 + ")")
+      .call(axisLeft(y))
+      .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", "0.71em")
+      .attr("fill", "#000")
+      .text("PM μg/m³");    
+    
+}
+
+
+
+
+function graphicBuilderWindow(data,selector){
+
+    
+ var valueline = line()
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y(d.value); })
+    .defined(((d) => d.value != -1));
+              
+    var margin = {top: 20, right: 10, bottom: 30, left: 30},
+    width = 800 - margin.left - margin.right,
+    height = 600 - margin.top - margin.bottom;
+
+    var x = scaleTime().range([0, width]);
+    var y = scaleLinear().range([height, 0]);     
+   
+    
+var newWindow = window.open('');    
+
+var svg = d3.select(newWindow.document.body).append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform","translate(" + margin.left + "," + margin.top + ")");       
+               
+    x.domain(extent(data, function(d) { return d.date; }));
+    y.domain([0, max(data, function(d) {return d.value;})]);
+               
+      if (user_selected_value == "PM10"){
+         
+         if (max(data, (i) => i.value) >= 50){
+                
+                svg.append("line")
+                .style("stroke", "red")
+                .attr("x1", 0)  
+                .attr("y1", y(50))  
+                .attr("x2", width)  
+                .attr("y2", y(50)) 
+                .attr("transform", "translate(" + 0 + "," + 0 + ")")
+                .attr("opacity", 1.0);
+                };    
+         
+          var limits = scale_options.PM10.valueDomain;
+          var colors = scale_options.PM10.colorRange;
+               
+        };
+                  
+               
+     if (user_selected_value == "PM25"){
+             
+         
+         if (max(data, (i) => i.value) >= 25){
+
+                 svg.append("line")
+                .style("stroke", "red")
+                .attr("x1", 0)  
+                .attr("y1", y(25))  
+                .attr("x2", width)  
+                .attr("y2", y(25)) 
+               .attr("transform", "translate(" + 0 + "," + 0 + ")")
+                .attr("opacity", 1.0);
                 
                 
+            };  
+               
+            var limits = scale_options.PM25.valueDomain;
+          var colors = scale_options.PM25.colorRange;
+               
+         
+     };                   
+                
+    //FORCE UPDATE THE GRADIENT
+
+    d3.selectAll("#line-gradient").remove();          
            
     svg.append("linearGradient")
       .attr("id", "line-gradient")
@@ -1500,10 +1674,10 @@ function graphicBuilder(data,selector){
       .attr("class", "line")  
     .attr("fill", "none")
     .attr("stroke", "url(#line-gradient)" )
-//    .style("stroke", "black")
+  //.style("stroke", "black")
       .attr("d", valueline);
   
-    svg.append("g")  
+    svg2.append("g")  
    .attr("transform", "translate(" + 0 + "," + height  + ")")
     .attr("class", "axis axis--x")
     .call(axisBottom(x).ticks(3));           
@@ -1518,7 +1692,10 @@ function graphicBuilder(data,selector){
       .attr("y", 6)
       .attr("dy", "0.71em")
       .attr("fill", "#000")
-      .text("PM μg/m³");           
-                    
-    
+      .text("PM μg/m³");      
+       
 }
+
+
+
+

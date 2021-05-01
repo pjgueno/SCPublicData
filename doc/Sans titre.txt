@@ -1,0 +1,37 @@
+Sehr geehrte Damen und Herren,
+
+ich möchte Ihre API einsetzen und habe ein ganzes Program in der Sprache Javascript entwickelt.
+
+Leider ist die API durch das CORS policy blockiert:
+
+Access to fetch at 'https://www.umweltbundesamt.de/api/air_data/v2/measures/json?date_from=2021-04-21&time_from=1&date_to=2021-04-21&time_to=15&component=9' from origin 'http://127.0.0.1:8080' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource. If an opaque response serves your needs, set the request's mode to 'no-cors' to fetch the resource with CORS disabled.
+
+Das ist die normale Nachricht für Internetseiten die nicht frei zuganglich sind.
+
+Was is das Nutzen von einer API, wenn man die Daten nicht erreichbar sind ?
+
+Ich sehe es unter diesem Link: https://www.umweltbundesamt.de/themen/nachhaltigkeit-strategien-internationales/information-als-instrument/linked-environment-data,
+
+das der UBA fördert die folgenden Punkte:
+
+    Die Daten sind uneingeschränkt frei verfügbar
+    Der Zugang basiert auf offenen Standards - kommerzielle Werkzeuge sind nicht erforderlich
+    Die Daten dürfen weltweit mit Daten anderer Organisationen vernetzt werden.
+
+Eine freie API würde zudem auf jedem Fall mit dem Umweltinformationsgesetz des Bundes (UIG) gut passen : https://www.umweltbundesamt.de/themen/evaluation-des-umweltinformationsgesetzes-des
+
+Ich stehe Ihnen zur Verfügung, um Ihnen zu erklären, was ich mit der API vorhabe.
+Ich würde mich sehr bedanken, wenn Sie mir ein Token oder einen freien Zugang geben könnte.
+
+Darüber hinaus habe ich vile Ideen, um Ihre Karten zu verbessern.
+
+Mit freundlichen Grüßen,
+
+Pierre-Jean Guéno
+-- 
+
+Best greetings from Saarbrücken,
+
+Pierre-Jean Guéno - Data visualization & Partnership Development for French-speaking countries
+
+Sensor.Community/en | Maps.Sensor.Community/ | Archive.Sensor.Community 
