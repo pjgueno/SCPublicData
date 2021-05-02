@@ -73,6 +73,15 @@ import './static-files'
 //Date.UTC()
 
 
+//https://www.umweltbundesamt.de/api/air_data/v2/measures/chart?date_from=2021-04-23&time_from=24&date_to=2021-05-01&time_to=23&data[0][co]=1&data[0][sc]=3&data[0][da]=2021-05-01&data[0][st]=1777
+
+
+//    https://www.umweltbundesamt.de/api/air_data/v2/components/json
+    
+//    https://www.umweltbundesamt.de/api/air_data/v2/scopes/json
+
+
+// https://www.umweltbundesamt.de/api/air_data/v2/measures/chart?date_from=2021-04-23&time_from=24&date_to=2021-05-01&time_to=23&data[0][co]=1&data[0][sc]=2&data[0][st]=1777
 
 let SC_PM = {"type": "FeatureCollection","name": "SCSensors","crs": { "type": "name", "properties": {"name": "urn:ogc:def:crs:OGC:1.3:CRS84" }},"features": []};
 
@@ -262,7 +271,7 @@ var UBAStationsMap = L.geoJSON(UBAofficialData.PM25,{
                                                     
                           if (feature.properties.Value == -1){feature.properties.Value = "N/A"};
                           
-                        var popupContent = "<h2>UBA STATIONS MAP</h2><p><b>Name</b> : "+feature.properties.name+"</p><p><b>Value</b> : "+feature.properties.value+" µg\/m&sup3; ("+ feature.properties.type1 +")</p><button type='button' id='button" + feature.properties.code + "' value='" + feature.properties.code + "'>Show graph!</button><div id='graph"+ feature.properties.code +"'></div>";
+                        var popupContent = "<h2>UBA STATIONS MAP</h2><p><b>Name</b> : "+feature.properties.name+"</p><p><b>Value</b> : "+feature.properties.value+" µg\/m&sup3; ("+ feature.properties.type1 +")</p><button type='button' id='button" + feature.properties.id + "' value='" + feature.properties.id + "'>Show graph!</button><div id='graph"+ feature.properties.id +"'></div>";
                         layer.bindPopup(popupContent,{closeOnClick: false,autoClose: false,closeButton:true});
                       }
 
@@ -411,7 +420,7 @@ window.onload = function () {
 	map.clicked = 0;
     
 	//retrieve data from api
-retrieveData();
+//retrieveData();
 //    retrieveDataEU();
 //    retrieveDataLuchtmeetnet();
     retrieveDataUBA();
@@ -428,6 +437,8 @@ retrieveData();
 //       retrieveDataEU();
 //        LuchtmeetnetStationsMap.clearLayers();
 //        retrieveDataLuchtmeetnet();
+        UBAStationsMap.clearLayers();
+        retrieveDataUBA();
 //        AtmoAURAStationsMap.clearLayers();
 //        retrieveDataAtmoAURA();
 //        AtmoPACAStationsMap.clearLayers();
@@ -765,6 +776,121 @@ retrieveData();
             });
         };
         
+         if(popuptype == "UBA STATIONS MAP") {
+           
+            var stationid = d3.select(e.popup.getElement())._groups[0][0].children[0].children[0].children[3].value;
+             
+            console.log(stationid);
+
+            var graph = false;
+        
+            d3.select('#button'+ stationid ).on('click', function(){                  
+            var selector = '#graph'+stationid;
+                
+            var dateString = UBAdateFormater(new Date(),new Date(),1);
+               
+            if (user_selected_value == "PM10"){
+            
+                 var urlUBA = "https://maps.sensor.community/uba-api/air_data/v2/measures/chart?"+ dateString +"&data[0][co]=1&data[0][sc]=2&data[0][st]="+stationid;
+                
+                
+             //   changer le SCOPE!!!!
+
+            };
+
+
+            if (user_selected_value == "PM25"){
+
+                 var urlUBA = "https://maps.sensor.community/uba-api/air_data/v2/measures/chart?"+ dateString +"&data[0][co]=9&data[0][sc]=2&data[0][st]="+stationid;
+
+            };         
+            
+                
+            console.log(urlUBA);
+                
+                
+              var parseDate = timeParse("%Y-%m-%d %H:%M:%S");
+                
+            if (graph == false){
+                
+           fetch(urlUBA)
+			.then((resp) => resp.json())
+			.then((data) => {
+          
+				console.log('successful retrieved data');
+               
+               
+        var keynr = data.request.data[0].co.concat(data.request.data[0].sc).concat(data.request.data[0].st);
+        
+               console.log(keynr);
+               
+        var dataGraphOri = data.data.values[keynr][3];
+        var dataKeys = Object.keys(dataGraphOri);
+            
+        console.log(dataGraphOri); 
+        
+        var dataGraphUBA= [];
+               
+               
+        dataKeys.forEach(function(k){
+            
+            var dataGraphObj = { "date": null , "value": 0};
+            dataGraphObj.date = parseDate(k);
+            dataGraphObj.value = parseInt(dataGraphOri[k]);
+            
+            dataGraphUBA.push(dataGraphObj);
+        });
+
+               
+        console.log(dataGraphUBA);
+           
+      dataGraphUBA.sort(function(a,b){return (a.date)-(b.date)});                 graphicBuilder(dataGraphUBA,selector);               
+//     }); 
+//     
+          graph = true;
+        d3.select('#button'+ stationid).html("Hide Graph!");       
+//   
+           });
+           }else{  
+//             d3.select(selector).html(""); 
+//            graph = false;
+//            d3.select('#button'+ stationid).html("Show Graph!");  
+          };
+ });
+             
+             
+             
+        };
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
     })
 };
 
@@ -833,14 +959,19 @@ SCSensorsMap.addData(SC_PM).bringToBack();
 
 function retrieveDataUBA() {
 
-var dateString = UBAdateFormater(new Date());
+var dateString = UBAdateFormater(new Date(),new Date(),0);
 
 //var URLPM10 = "https://www.umweltbundesamt.de/api/air_data/v2/measures/json?date_from=2021-04-21&time_from=1&date_to=2021-04-21&time_to=15&component=1";
 //var URLPM25 = "https://www.umweltbundesamt.de/api/air_data/v2/measures/json?date_from=2021-04-21&time_from=1&date_to=2021-04-21&time_to=15&component=9";
     
 //    https://www.umweltbundesamt.de/api/air_data/v2/components/json
     
-var URLPM10 = "https://maps.sensor.community/uba-api/air_data/v2/measures/json?date_from=2021-04-21&time_from=1&date_to=2021-04-21&time_to=15&component=1";
+//    https://www.umweltbundesamt.de/api/air_data/v2/scopes/json
+    
+    
+console.log(dateString); 
+    
+var URLPM10 = "https://maps.sensor.community/uba-api/air_data/v2/measures/json?" + dateString + "&component=1&scope=2";
 var URLPM25 = "https://maps.sensor.community/uba-api/air_data/v2/measures/json?date_from=2021-04-21&time_from=1&date_to=2021-04-21&time_to=15&component=9";
 
 console.log(URLPM10);
@@ -1077,15 +1208,28 @@ function EUdateFormater(date) {
 return result;
 }
 
-function UBAdateFormater(date) {
+function UBAdateFormater(date,date2,option) {
 
-    date.setDate(date.getDate()-1); // can adjust the day by substracting
-
+    date.setDate(date.getDate()); // can adjust the day by substracting
+    date2.setDate(date2.getDate()-4);
+        
     
-   var result = "date_from="+date.getUTCFullYear().toString()+"-"+pad(date.getUTCMonth(),2,true)+"-"+pad(date.getUTCDate(),2,false)+"&time_from=12"+"&date_to="+date.getUTCFullYear().toString()+"-"+pad(date.getUTCMonth(),2,true)+"-"+pad(date.getUTCDate(),2,false)+"&time_to=12";
-
+    if (option == 0){
+    
+   var result = "date_from="+date.getUTCFullYear().toString()+"-"+pad(date.getUTCMonth(),2,true)+"-"+pad(date.getUTCDate(),2,false)+"&time_from="+(date.getUTCHours()-6)+ "&date_to="+date.getUTCFullYear().toString()+"-"+pad(date.getUTCMonth(),2,true)+"-"+pad(date.getUTCDate(),2,false)+"&time_to="+ date.getUTCHours();
+    };
+    
+    if (option == 1){
+    
+   var result = "date_from="+date2.getUTCFullYear().toString()+"-"+pad(date2.getUTCMonth(),2,true)+"-"+pad(date2.getUTCDate(),2,false)+"&time_from="+(date.getUTCHours())+ "&date_to="+date.getUTCFullYear().toString()+"-"+pad(date.getUTCMonth(),2,true)+"-"+pad(date.getUTCDate(),2,false)+"&time_to="+ date.getUTCHours();
+    };
+       
+    
 return result;
 }
+
+
+
 
 function pad(num,size,month) {
 
@@ -1182,8 +1326,8 @@ function reloadMap(val) {
         AtmoAURAStationsMap.addData(AtmoAURADataCurrent.PM10).bringToFront();
         AtmoPACAStationsMap.clearLayers();
         AtmoPACAStationsMap.addData(AtmoPACADataCurrent.PM10).bringToFront();
-        AtmoOccitanieStationsMap.clearLayers();
-        AtmoOccitanieStationsMap.addData(AtmoOccitanieDataCurrent.PM10).bringToFront();
+        UBAStationsMap.clearLayers();
+        UBAStationsMap.addData(UBAofficialData.PM10).bringToFront();
         };
     
      if(val == "PM25"){
@@ -1196,7 +1340,9 @@ function reloadMap(val) {
         AtmoPACAStationsMap.clearLayers();
         AtmoPACAStationsMap.addData(AtmoPACADataCurrent.PM25).bringToFront();
         AtmoOccitanieStationsMap.clearLayers();
-        AtmoOccitanieStationsMap.addData(AtmoOccitanieDataCurrent.PM25).bringToFront();  
+        AtmoOccitanieStationsMap.addData(AtmoOccitanieDataCurrent.PM25).bringToFront(); 
+        UBAStationsMap.clearLayers();
+        UBAStationsMap.addData(UBAofficialData.PM25).bringToFront();   
         }; 
 }
 
