@@ -54,6 +54,141 @@
 		<div id="explanation"></div>
 		<div id="map-info" style="display: none;"></div>
 	</div>
+    
+    
+    
+    <div id="source_container">
+           
+           <table id="sources">
+        <tbody>
+          <tr>
+            <td>
+            <input type="checkbox" id="sc" name="sc">
+            <label for="sc">Sensor.Community</label>
+            </td>
+            <td>
+            <input type="checkbox" id="eea" name="eea">
+            <label for="eea">EEA</label>
+            </td>
+            <td>
+            <input type="checkbox" id="uba" name="uba">
+            <label for="uba">Umwelt Bundesamt</label>
+            </td>
+            <td>
+            <input type="checkbox" id="aura" name="aura">
+            <label for="aura">Atmo AURA</label>
+            </td>
+            <td>
+            <input type="checkbox" id="paca" name="paca">
+            <label for="paca">Atmo PACA</label>
+            </td>
+            <td>
+            <input type="checkbox" id="occi" name="occi">
+            <label for="occi">Atmo Occitanie</label>
+            </td>
+            <td>
+            <input type="checkbox" id="lucht" name="lucht">
+            <label for="lucht">Luchtmeetnet</label>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input type="radio" id="current" name="sc" value="current">
+              <label for="current">Current</label>
+            </td>
+            <td>
+<!--
+              <input type="radio" id="current" name="eea" value="current" checked>
+              <label for="current">Current</label>
+-->
+            </td>
+            <td>
+<!--
+              <input type="radio" id="current" name="uba" value="current">
+              <label for="current">Current</label>
+-->
+            </td>
+            <td>
+              <input type="radio" id="current" name="aura" value="current">
+              <label for="current">Current</label>
+            </td>
+            <td>
+              <input type="radio" id="current" name="paca" value="current">
+              <label for="current">Current</label>
+            </td>
+            <td>
+              <input type="radio" id="current" name="occi" value="current">
+              <label for="current">Current</label>
+            </td>
+            <td>
+              <input type="radio" id="current" name="lucht" value="current">
+              <label for="current">Current</label>
+            </td>
+            <tr>
+            <td>
+              <input type="radio" id="hourly" name="sc" value="hourly">
+              <label for="hourly">Hourly</label>
+            </td>
+            <td>
+              <input type="radio" id="hourly" name="eea" value="hourly">
+              <label for="hourly">Hourly</label>
+            </td>
+            <td>
+              <input type="radio" id="hourly" name="uba" value="hourly">
+              <label for="hourly">Hourly</label>
+            </td>
+            <td>
+              <input type="radio" id="hourly" name="aura" value="hourly">
+              <label for="hourly">Hourly</label>
+            </td>
+            <td>
+              <input type="radio" id="hourly" name="paca" value="hourly">
+              <label for="hourly">Hourly</label>
+            </td>
+            <td>
+              <input type="radio" id="hourly" name="occi" value="hourly">
+              <label for="hourly">Hourly</label>
+            </td>
+            <td>
+              <input type="radio" id="hourly" name="lucht" value="hourly">
+              <label for="hourly">Hourly</label>
+            </td>
+            <tr>
+            <td>
+              <input type="radio" id="daily" name="sc" value="daily">
+              <label for="daily">Daily</label>
+            </td>
+            <td>
+              <input type="radio" id="daily" name="eea" value="daily">
+              <label for="daily">Daily</label>
+            </td>
+            <td>
+              <input type="radio" id="daily" name="uba" value="daily">
+              <label for="daily">Daily</label>
+            </td>
+            <td>
+              <input type="radio" id="daily" name="aura" value="daily">
+              <label for="daily">Daily</label>
+            </td>
+            <td>
+              <input type="radio" id="daily" name="paca" value="daily">
+              <label for="daily">Daily</label>
+            </td>
+            <td>
+              <input type="radio" id="daily" name="occi" value="daily">
+              <label for="daily">Daily</label>
+            </td>
+            <td>
+              <input type="radio" id="daily" name="lucht" value="daily">
+              <label for="daily">Daily</label>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+        
+    </div>
+
+    
 	<div id="UI_container">
 		<div id ='legendcontainer'>
 			<div class ="legend" id="legend_PM10" style="display: none;">
@@ -97,30 +232,9 @@
 			<input type="checkbox" id="cb_wind" name="wind" checked="checked" /><label for="cb_wind" id="label_wind_layer">Wind layer</label><br/>
 			<!-- <input type="checkbox" id="cb_eustations" name="eustations" checked="" /><label for="cb_eustations" id="label_eustations">EU stations</label><br/> -->
 		</div>
-	</div>
-
-	<div id='map'>
-	</div>
-    
-<!--
-    <script>
-    
-
-function getGraphSC(id){
-    
-    	var panel_str = "<iframe src='https://maps.sensor.community/grafana/d-solo/000000004/single-sensor-view?orgId=1&panelId=2&var-node=" + id + "' width='290' height='200' frameborder='0'></iframe>";
         
-        var selector = "graph"+id;
-    
-        document.getElementById(selector).innerHTML = panel_str;
-            
-}
-
-    
-    
-    </script>
-    
--->
+	</div>
+<div id='map'></div>
     
     
 </body>

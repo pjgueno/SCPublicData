@@ -39,8 +39,7 @@ import * as zooms from './zooms.js';
 import * as translate from './translate.js';
 
 // favicon config
-import './static-files'
-
+import './static-files';
 
 //Atmo Sud et Atmo Occitanie
 
@@ -82,6 +81,11 @@ import './static-files'
 
 
 // https://www.umweltbundesamt.de/api/air_data/v2/measures/chart?date_from=2021-04-23&time_from=24&date_to=2021-05-01&time_to=23&data[0][co]=1&data[0][sc]=2&data[0][st]=1777
+
+
+
+//define the data "tables"
+
 
 let SC_PM = {"type": "FeatureCollection","name": "SCSensors","crs": { "type": "name", "properties": {"name": "urn:ogc:def:crs:OGC:1.3:CRS84" }},"features": []};
 
@@ -231,6 +235,24 @@ const colorScalePM10 = scaleLinear()
     .domain(scale_options.PM25.valueDomain)
     .range(scale_options.PM25.colorRange)
     .interpolate(interpolateRgb);
+
+
+// json object to log which data are downloaded and dislayed
+
+var timer0 = new Date
+
+var logger = {
+"sc":{"display":false,"data":"nodata","time":timer0},
+"eea":{"display":false,"data":"nodata","time":timer0},
+"uba":{"display":false,"data":"nodata","time":timer0},
+"aura":{"display":false,"data":"nodata","time":timer0},
+"paca":{"display":false,"data":"nodata","time":timer0},
+"occi":{"display":false,"data":"nodata","time":timer0},
+"lucht":{"display":false,"data":"nodata","time":timer0}
+};
+
+
+// Intitialisation of the Leaflet Layers for each dataset
 
 
 var EUStationsMap = L.geoJSON(EUofficialData.PM25,{
@@ -422,23 +444,29 @@ window.onload = function () {
 	//retrieve data from api
 //retrieveData();
 //    retrieveDataEU();
-//    retrieveDataLuchtmeetnet();
-    retrieveDataUBA();
-    //retrieveDataAtmoAURA();
-    //retrieveDataAtmoPACA();
+    //retrieveDataLuchtmeetnet();
+   // retrieveDataUBA();
+   // retrieveDataAtmoAURA();
+   // retrieveDataAtmoPACA();
     //retrieveDataAtmoOccitanie();
 
 
+    
+//    REVOIR ICI AVEC DES IF
+    
 	// refresh data
 	setInterval(function () {
-     // SCSensorsMap.clearLayers();
-	//retrieveData();
+//    SCSensorsMap.clearLayers();
+//	retrieveData();
+        
+        
+        
 //        EUStationsMap.clearLayers();
 //       retrieveDataEU();
 //        LuchtmeetnetStationsMap.clearLayers();
 //        retrieveDataLuchtmeetnet();
-        UBAStationsMap.clearLayers();
-        retrieveDataUBA();
+       // UBAStationsMap.clearLayers();
+       // retrieveDataUBA();
 //        AtmoAURAStationsMap.clearLayers();
 //        retrieveDataAtmoAURA();
 //        AtmoPACAStationsMap.clearLayers();
@@ -491,6 +519,38 @@ window.onload = function () {
 	switchWindLayer();
 //	d3.select("#cb_labs").on("change", switchLabLayer);
 	d3.select("#cb_wind").on("change", switchWindLayer);
+    
+    
+    
+//    Events for the checkboxes
+    
+    
+    d3.select("#sc").on("change", function (){switcher("sc",SCSensorsMap)});
+//    d3.select("#eea").on("change", switchEEA);
+    d3.select("#uba").on("change", function (){switcher("uba",UBAStationsMap)});
+//    d3.select("#aura").on("change", switchAURA);
+//    d3.select("#paca").on("change", switchPACA);
+//    d3.select("#occi").on("change", switchOccitanie);
+//    d3.select("#lucht").on("change", switchLuchtmeetnet);
+    
+    
+//    Events for the radios
+
+    
+    d3.selectAll('input[type="radio"][name="sc"]').on("change", function (){switcher2("sc",this.value,SCSensorsMap)});
+//    d3.selectAll('input[type="radio"][name="eea"]').on("change", function (){switcher2("eea",this.value,SCSensorsMap)});
+    d3.selectAll('input[type="radio"][name="uba"]').on("change", function (){switcher2("uba",this.value,UBAStationsMap)});
+//    d3.selectAll('input[type="radio"][name="aura"]').on("change", function (){switcher2("aura",this.value,SCSensorsMap)});
+//    d3.selectAll('input[type="radio"][name="paca"]').on("change", function (){switcher2("paca",this.value,SCSensorsMap)});
+//    d3.selectAll('input[type="radio"][name="occi"]').on("change", function (){switcher2("occi",this.value,SCSensorsMap)});
+//    d3.selectAll('input[type="radio"][name="lucht"]').on("change", function (){switcher2("lucht",this.value,SCSensorsMap)});
+    
+    
+    
+    
+    
+    
+    
 
     map.on('popupopen', function(e){
         console.log("open popup");
@@ -913,8 +973,25 @@ function colorScaler(option,value){
      }else{console.log(typeof value)};
 };
 
-function retrieveData() {
-    api.getData("https://data.sensor.community/static/v2/data.dust.min.json", 1).then(function (result) {
+function retrieveData(option) {
+    
+    var urlapi = "";
+    
+    switch (option) {
+      case "current":
+        urlapi = "https://data.sensor.community/static/v2/data.dust.min.json";
+        break;
+      case "hourly":
+        urlapi = "https://data.sensor.community/static/v2/data.1h.json";
+        break;
+      case "daily":
+        urlapi = "https://data.sensor.community/static/v2/data.24h.json";
+        break;
+    };
+    
+    
+    
+    api.getData(urlapi, 1).then(function (result) {
         if (result.timestamp > timestamp_data) {
             timestamp_data = result.timestamp;
             timestamp_from = result.timestamp_from;
@@ -948,20 +1025,27 @@ var mapper = result.cells.map(function(obj){
     })
 
 SC_PM.features = mapper;
+        
+if(logger.sc.display == true){
+    
+    SCSensorsMap.clearLayers();
+    SCSensorsMap.addData(SC_PM).bringToBack();
+    
+};
 
 
-SCSensorsMap.clearLayers();
-SCSensorsMap.addData(SC_PM).bringToBack();
-
+        
 //d3.select("#loading_layer").style("display", "none");   
-    });
+    });    
 }
 
-function retrieveDataUBA() {
+function retrieveDataUBA(option) {
 
-var dateString = UBAdateFormater(new Date(),new Date(),0);
+ 
 
 //var URLPM10 = "https://www.umweltbundesamt.de/api/air_data/v2/measures/json?date_from=2021-04-21&time_from=1&date_to=2021-04-21&time_to=15&component=1";
+    
+//PM2.5 does not work  
 //var URLPM25 = "https://www.umweltbundesamt.de/api/air_data/v2/measures/json?date_from=2021-04-21&time_from=1&date_to=2021-04-21&time_to=15&component=9";
     
 //    https://www.umweltbundesamt.de/api/air_data/v2/components/json
@@ -969,18 +1053,30 @@ var dateString = UBAdateFormater(new Date(),new Date(),0);
 //    https://www.umweltbundesamt.de/api/air_data/v2/scopes/json
     
     
-console.log(dateString); 
+//    REVOIR HEURE UTC OU HEURE LOCALE?
     
-var URLPM10 = "https://maps.sensor.community/uba-api/air_data/v2/measures/json?" + dateString + "&component=1&scope=2";
-var URLPM25 = "https://maps.sensor.community/uba-api/air_data/v2/measures/json?date_from=2021-04-21&time_from=1&date_to=2021-04-21&time_to=15&component=9";
+    
+    switch (option) {
+      case "hourly":
+        var dateString = UBAdateFormater(new Date(),new Date(),0);
+        var URLPM10 = "https://maps.sensor.community/uba-api/air_data/v2/measures/json?" + dateString + "&component=1&scope=2";
+        break;
+      case "daily":
+        var dateString = UBAdateFormater(new Date(),new Date(),1);
+        var URLPM10 = "https://maps.sensor.community/uba-api/air_data/v2/measures/json?" + dateString + "&component=1&scope=1";
+        break;
+    };
+    
 
 console.log(URLPM10);
-console.log(URLPM25);
+
 
 UBAdata.getData(URLPM10).then(function (result) {
     
     
-
+    console.log(result)
+    
+    
     UBAofficialData.PM10.features = result;
     
     console.log(UBAofficialData.PM10.features);
@@ -991,21 +1087,6 @@ UBAdata.getData(URLPM10).then(function (result) {
     }
 
         });
-
-UBAdata.getData(URLPM25).then(function (result) {
-    
-    console.log(result);
-    
-    UBAofficialData.PM25.features = result;  
-
-//    if(user_selected_value == "PM25"){
-//    UBAStationsMap.clearLayers();
-//    UBAStationsMap.addData(UBAofficialData.PM25).bringToFront();
-//    }
-
-        });
-
-
 }
 
 function retrieveDataAtmoAURA() {
@@ -1146,7 +1227,7 @@ Luchtmeetnetdata.getData(URLPM25).then(function (result) {
 }); 
 }
 
-function retrieveDataEU() {
+function retrieveDataEU(option) {
 
 var dateString = EUdateFormater(new Date());
 var URLPM10 = "https://discomap.eea.europa.eu/Map/UTDViewer/dataService/Hourly?polu=PM10&dt="+dateString;
@@ -1160,7 +1241,8 @@ EUdata.getData(URLPM10).then(function (result) {
 
     EUofficialData.PM10.features = result;
 
-    if(user_selected_value == "PM10"){
+    if(user_selected_value == "PM10" && logger.eea.display == true){
+    
     EUStationsMap.clearLayers();
     EUStationsMap.addData(EUofficialData.PM10).bringToFront();
     }
@@ -1170,16 +1252,20 @@ EUdata.getData(URLPM10).then(function (result) {
 EUdata.getData(URLPM25).then(function (result) {
     EUofficialData.PM25.features = result;  
 
-    if(user_selected_value == "PM25"){
+    if(user_selected_value == "PM25" && logger.eea.display == true){
     EUStationsMap.clearLayers();
     EUStationsMap.addData(EUofficialData.PM25).bringToFront();
     }
 
         });
-
-console.log(user_selected_value);
 }    
-    
+
+
+
+
+
+
+
 function LuchtmeetnetdateFormater(date) {
     
 const dateFormater = timeFormat("%Y-%m-%dT%H:%M:%SZ");
@@ -1439,6 +1525,12 @@ function switchTo(element) {
 	custom_select.select(".select-selected").attr("class", "select-selected");
 	reloadMap(user_selected_value);
 	custom_select.select(".select-items").remove();
+    
+    
+    if (user_selected_value == "PM10"){d3.selectAll('input[name="uba"]')._groups[0].forEach(function(e){e.disabled = false})};
+    
+    if (user_selected_value == "PM25"){d3.selectAll('input[name="uba"]')._groups[0].forEach(function(e){e.disabled = true})};
+      
 }
 
 function getCurrentAURA(data){
@@ -1842,6 +1934,213 @@ var svg = d3.select(newWindow.document.body).append("svg")
        
 }
 
+//d3.select("#"+htmlid)
+
+function switcher(key,geojson){
+    
+    console.log("SWITCH");
+    console.log(key);   
+    
+                console.log(logger[key].data);
+            console.log(geojson);
+    
+    
+       	if (d3.select("#"+key).property("checked")) {        
+            logger[key].display = true;
+        
+            if (logger[key].data == "nodata" && d3.selectAll('input[type="radio"][name="'+key+'"]:checked').node() != null){
+            var option = d3.selectAll('input[type="radio"][name="'+key+'"]:checked').node().value
+            logger[key].data = option;
+                switch (key) {
+                  case "sc":
+                    retrieveData(option);
+                    break;
+                  case "eea":
+
+                    break;
+                  case "uba":
+                    retrieveDataUBA(option);
+                    break;
+                  case "aura":
+
+                    break;
+                  case "paca":
+
+                    break;
+                  case "occi":
+
+                    break;
+                  case "lucht":
+
+                    break;
+                }            
+            }else {
+                switch (key) {
+                  case "sc":
+                    geojson.addData(SC_PM).bringToBack();
+                    break;
+                  case "eea":
+
+                    break;
+                  case "uba":   
+//                    ONLY PM10    
+                    geojson.addData(UBAofficialData.PM10).bringToFront();
+                    break;
+                  case "aura":
+
+                    break;
+                  case "paca":
+
+                    break;
+                  case "occi":
+
+                    break;
+                  case "lucht":
+
+                    break;
+                };    
+            } 
+	} else {
+            geojson.clearLayers();
+            logger[key].display = false;
+	}      
+}
+
+
+function switcher2(key,option,geojson){
+    
+    console.log("SWITCH2");
+    console.log(key); 
+    console.log(option);
+    
+    logger[key].data = option;
+    
+    switch (key) {
+              case "sc":
+                retrieveData(option);
+                break;
+              case "eea":
+                
+                break;
+              case "uba":
+                retrieveDataUBA(option);
+                break;
+              case "aura":
+                
+                break;
+              case "paca":
+                
+                break;
+              case "occi":
+                
+                break;
+              case "lucht":
+                
+                break;
+            };   
+}
 
 
 
+
+
+
+
+
+
+
+
+//
+//
+//
+//
+//function switchSC(){
+//   	if (d3.select("#sc").property("checked")) {        
+//   
+//        if (logger.sc.display == false && logger.sc.data == "nodata"){
+//
+////        if (SCSensorsMap.getLayers().length == 0 ){
+//            
+////            VIDER LES FEATURES ? ET TESTER?
+//            
+//                            SCSensorsMap.addData(SC_PM).bringToBack();
+//
+//            
+//            var selector = d3.selectAll('input[type="radio"][name="sc"]:checked').node().value;
+//            console.log(selector);
+//        
+//        
+//        
+//        
+//        
+//        
+//        
+//        }else{
+////            reloadMap(user_selected_value)  
+//
+//        } 
+//	} else {
+//            SCSensorsMap.clearLayers();
+//            logger.sc.display == false;
+//	}    
+//}
+//
+//
+//
+//
+//
+//
+//
+//
+//function switchEEA(){
+//   	if (d3.select("#eea").property("checked")) {
+//        
+//	} else {
+//        
+//	}   
+//}
+//
+//function switchUBA(){
+//   	if (d3.select("#uba").property("checked")) {
+//        
+//	} else {
+//        
+//	}     
+//    
+//}
+//
+//function switchAURA(){
+//   	if (d3.select("#aura").property("checked")) {
+//        
+//	} else {
+//        
+//	}     
+//    
+//}
+//
+//function switchPACA(){
+//    if (d3.select("#paca").property("checked")) {
+//        
+//	} else {
+//        
+//	}     
+//    
+//}
+//
+//function switchOccitanie(){
+//    if (d3.select("#occi").property("checked")) {
+//        
+//	} else {
+//        
+//	}     
+//    
+//}
+//
+//function switchLuchtmeetnet(){
+//   	if (d3.select("#lucht").property("checked")) {
+//        
+//	} else {
+//        
+//	}  
+//    
+//}
